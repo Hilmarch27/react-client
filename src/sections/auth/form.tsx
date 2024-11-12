@@ -19,13 +19,14 @@ import {
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, SubmitHandler } from "react-hook-form";
-import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
+import api from "@/lib/axios";
+import { useAuthStore } from "@/hooks/store/use-auth-store";
 
 const formSchema = z.object({
-  pn: z.string().min(2, {
-    message: "Personal number must be at least 2 characters.",
+  email: z.string().email({
+    message: "Please enter a valid email address.",
   }),
   password: z.string().min(3, {
     message: "Password must be at least 3 characters.",
@@ -38,7 +39,8 @@ type LoginFormValues = FormSchema;
 
 const AuthForm = () => {
   const navigate = useNavigate();
-//   const [loading, setLoading] = useState(false);
+  const { setAuth } = useAuthStore();
+  //   const [loading, setLoading] = useState(false);
   const [err, setError] = useState("");
 
   const form = useForm<LoginFormValues>({
@@ -47,12 +49,10 @@ const AuthForm = () => {
 
   const onSubmit: SubmitHandler<LoginFormValues> = async (values) => {
     try {
-      const pnAsInt = parseInt(values.pn, 10);
-
-      const response = await axios.post(
-        `/api/auth/login`,
+      const response = await api.post(
+        `/api/users/login`,
         {
-          pn: pnAsInt,
+          email: values.email,
           password: values.password,
         },
         {
@@ -63,15 +63,23 @@ const AuthForm = () => {
       );
 
       if (response.data.data) {
-        const { accessToken, refreshToken, isAdmin } = response.data.data;
-        localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("refreshToken", refreshToken);
-        localStorage.setItem("isAdmin", JSON.stringify(isAdmin));
+        // Ubah format data sesuai dengan type User
+        const userData = {
+          data: {
+            email: response.data.data.email,
+            name: response.data.data.name,
+            role: response.data.data.role,
+          },
+        };
 
+        setAuth(userData);
+        const { isAdmin } = response.data.data;
         if (isAdmin) {
-          navigate({ to: "/profile" });
+          console.log("admin routes active");
+          navigate({ to: "/" });
         } else {
-          navigate({ to: "/profile" });
+          console.log("user routes active");
+          navigate({ to: "/dashboard" });
         }
       }
     } catch (error: any) {
@@ -95,14 +103,14 @@ const AuthForm = () => {
           <CardContent className="space-y-2">
             <FormField
               control={form.control}
-              name="pn"
+              name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Personal Number</FormLabel>
+                  <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input
                       //   onlyNumbers={true}
-                      placeholder="Personal Number"
+                      placeholder="Email"
                       {...field}
                     />
                   </FormControl>

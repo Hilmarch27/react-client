@@ -8,18 +8,24 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
+import { createFileRoute } from '@tanstack/react-router'
+
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as ProfileImport } from './routes/profile'
 import { Route as IndexImport } from './routes/index'
-import { Route as AuthLoginImport } from './routes/_auth/login'
+import { Route as authLoginImport } from './routes/(auth)/login'
+import { Route as appLayoutsImport } from './routes/(app)/_layouts'
+import { Route as appLayoutsDashboardImport } from './routes/(app)/_layouts/dashboard'
+
+// Create Virtual Routes
+
+const appImport = createFileRoute('/(app)')()
 
 // Create/Update Routes
 
-const ProfileRoute = ProfileImport.update({
-  id: '/profile',
-  path: '/profile',
+const appRoute = appImport.update({
+  id: '/(app)',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -29,10 +35,21 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const AuthLoginRoute = AuthLoginImport.update({
-  id: '/_auth/login',
+const authLoginRoute = authLoginImport.update({
+  id: '/(auth)/login',
   path: '/login',
   getParentRoute: () => rootRoute,
+} as any)
+
+const appLayoutsRoute = appLayoutsImport.update({
+  id: '/_layouts',
+  getParentRoute: () => appRoute,
+} as any)
+
+const appLayoutsDashboardRoute = appLayoutsDashboardImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => appLayoutsRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -46,63 +63,107 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/profile': {
-      id: '/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof ProfileImport
+    '/(app)': {
+      id: '/(app)'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof appImport
       parentRoute: typeof rootRoute
     }
-    '/_auth/login': {
-      id: '/_auth/login'
+    '/(app)/_layouts': {
+      id: '/(app)/_layouts'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof appLayoutsImport
+      parentRoute: typeof appRoute
+    }
+    '/(auth)/login': {
+      id: '/(auth)/login'
       path: '/login'
       fullPath: '/login'
-      preLoaderRoute: typeof AuthLoginImport
+      preLoaderRoute: typeof authLoginImport
       parentRoute: typeof rootRoute
+    }
+    '/(app)/_layouts/dashboard': {
+      id: '/(app)/_layouts/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof appLayoutsDashboardImport
+      parentRoute: typeof appLayoutsImport
     }
   }
 }
 
 // Create and export the route tree
 
+interface appLayoutsRouteChildren {
+  appLayoutsDashboardRoute: typeof appLayoutsDashboardRoute
+}
+
+const appLayoutsRouteChildren: appLayoutsRouteChildren = {
+  appLayoutsDashboardRoute: appLayoutsDashboardRoute,
+}
+
+const appLayoutsRouteWithChildren = appLayoutsRoute._addFileChildren(
+  appLayoutsRouteChildren,
+)
+
+interface appRouteChildren {
+  appLayoutsRoute: typeof appLayoutsRouteWithChildren
+}
+
+const appRouteChildren: appRouteChildren = {
+  appLayoutsRoute: appLayoutsRouteWithChildren,
+}
+
+const appRouteWithChildren = appRoute._addFileChildren(appRouteChildren)
+
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/profile': typeof ProfileRoute
-  '/login': typeof AuthLoginRoute
+  '/': typeof appLayoutsRouteWithChildren
+  '/login': typeof authLoginRoute
+  '/dashboard': typeof appLayoutsDashboardRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/profile': typeof ProfileRoute
-  '/login': typeof AuthLoginRoute
+  '/': typeof appLayoutsRouteWithChildren
+  '/login': typeof authLoginRoute
+  '/dashboard': typeof appLayoutsDashboardRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/profile': typeof ProfileRoute
-  '/_auth/login': typeof AuthLoginRoute
+  '/(app)': typeof appRouteWithChildren
+  '/(app)/_layouts': typeof appLayoutsRouteWithChildren
+  '/(auth)/login': typeof authLoginRoute
+  '/(app)/_layouts/dashboard': typeof appLayoutsDashboardRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/profile' | '/login'
+  fullPaths: '/' | '/login' | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/profile' | '/login'
-  id: '__root__' | '/' | '/profile' | '/_auth/login'
+  to: '/' | '/login' | '/dashboard'
+  id:
+    | '__root__'
+    | '/'
+    | '/(app)'
+    | '/(app)/_layouts'
+    | '/(auth)/login'
+    | '/(app)/_layouts/dashboard'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ProfileRoute: typeof ProfileRoute
-  AuthLoginRoute: typeof AuthLoginRoute
+  appRoute: typeof appRouteWithChildren
+  authLoginRoute: typeof authLoginRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ProfileRoute: ProfileRoute,
-  AuthLoginRoute: AuthLoginRoute,
+  appRoute: appRouteWithChildren,
+  authLoginRoute: authLoginRoute,
 }
 
 export const routeTree = rootRoute
@@ -116,18 +177,32 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/profile",
-        "/_auth/login"
+        "/(app)",
+        "/(auth)/login"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/profile": {
-      "filePath": "profile.tsx"
+    "/(app)": {
+      "filePath": "(app)",
+      "children": [
+        "/(app)/_layouts"
+      ]
     },
-    "/_auth/login": {
-      "filePath": "_auth/login.tsx"
+    "/(app)/_layouts": {
+      "filePath": "(app)/_layouts.tsx",
+      "parent": "/(app)",
+      "children": [
+        "/(app)/_layouts/dashboard"
+      ]
+    },
+    "/(auth)/login": {
+      "filePath": "(auth)/login.tsx"
+    },
+    "/(app)/_layouts/dashboard": {
+      "filePath": "(app)/_layouts/dashboard.tsx",
+      "parent": "/(app)/_layouts"
     }
   }
 }

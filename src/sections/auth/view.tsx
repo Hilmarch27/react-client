@@ -60,7 +60,7 @@ export default function LoginView() {
           <p className="px-8 text-center text-sm text-muted-foreground">
             By clicking continue, you agree to our{" "}
             <Link
-              to="/profile"
+              to="/"
               className="underline underline-offset-4 hover:text-primary"
             >
               Terms of Service
