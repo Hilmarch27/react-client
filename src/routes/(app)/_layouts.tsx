@@ -1,14 +1,19 @@
-import KBar from '@/components/kbar'
-import Header from '@/components/layout/header'
-import AppSidebar from '@/components/layout/main-sidebar'
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
-import { createFileRoute, Outlet } from '@tanstack/react-router'
+import KBar from "@/components/kbar";
+import Header from "@/components/layout/header";
+import AppSidebar from "@/components/layout/main-sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { useAuthStore } from "@/hooks/store/use-auth-store";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/(app)/_layouts')({
+export const Route = createFileRoute("/(app)/_layouts")({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
+  if (!useAuthStore((state) => state.isAuthenticated)) {
+    console.log("user redirect to login");
+    return window.location.replace("/login");
+  }
   return (
     <KBar>
       <SidebarProvider>
@@ -21,5 +26,5 @@ function RouteComponent() {
         </SidebarInset>
       </SidebarProvider>
     </KBar>
-  )
+  );
 }
