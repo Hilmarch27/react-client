@@ -11,7 +11,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useAuthStore } from "@/hooks/store/use-auth-store";
+import { useAuthStore } from "@/hooks/store/use-auth";
 export function UserNav() {
   const { user, logout } = useAuthStore();
   if (user) {

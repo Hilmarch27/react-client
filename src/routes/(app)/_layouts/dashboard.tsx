@@ -1,4 +1,5 @@
 import PageContainer from '@/components/layout/page-container'
+import DashboardView from '@/sections/dashboard/view'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/(app)/_layouts/dashboard')({
@@ -8,7 +9,7 @@ export const Route = createFileRoute('/(app)/_layouts/dashboard')({
 function RouteComponent() {
   return (
     <PageContainer>
-      <h1>ini dashboard</h1>
+      <DashboardView/>
     </PageContainer>
   )
 }

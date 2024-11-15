@@ -40,7 +40,7 @@ import {
 } from "lucide-react";
 import { Icons } from "../custom/icons";
 import { Link, useLocation } from "@tanstack/react-router";
-import { useAuthStore } from "@/hooks/store/use-auth-store";
+import { useAuthStore } from "@/hooks/store/use-auth";
 
 const company = {
   name: "Acme Inc",
@@ -52,7 +52,7 @@ export default function AppSidebar() {
   const { user } = useAuthStore();
   const pathname = useLocation().pathname;
 
-  console.log('user', user);
+  console.log("user", user);
 
   return (
     <Sidebar collapsible="icon">

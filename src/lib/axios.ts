@@ -1,4 +1,4 @@
-import { useAuthStore } from "@/hooks/store/use-auth-store";
+import { useAuthStore } from "@/hooks/store/use-auth";
 import axios from "axios";
 
 const apiUrl = import.meta.env.VITE_API_URL;

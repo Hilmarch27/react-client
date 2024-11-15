@@ -2,7 +2,7 @@ import KBar from "@/components/kbar";
 import Header from "@/components/layout/header";
 import AppSidebar from "@/components/layout/main-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { useAuthStore } from "@/hooks/store/use-auth-store";
+import { useAuthStore } from "@/hooks/store/use-auth";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/(app)/_layouts")({

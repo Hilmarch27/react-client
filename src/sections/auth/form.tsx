@@ -22,7 +22,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import api from "@/lib/axios";
-import { useAuthStore } from "@/hooks/store/use-auth-store";
+import { useAuthStore } from "@/hooks/store/use-auth";
 
 const formSchema = z.object({
   email: z.string().email({
